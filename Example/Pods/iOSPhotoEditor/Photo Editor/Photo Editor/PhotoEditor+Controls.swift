@@ -102,7 +102,9 @@ extension PhotoEditorViewController {
         canvasImageView.image = nil
         //clear stickers and textviews
         for subview in canvasImageView.subviews {
-            subview.removeFromSuperview()
+            if !subview.isKind(of: UIView.self) {
+                subview.removeFromSuperview()
+            }
         }
     }
     
