@@ -19,7 +19,7 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
      */
     func panGesture(_ recognizer: UIPanGestureRecognizer) {
         
-        if let view = recognizer.view {
+        if let view = recognizer.view, let _ = self.activeView {
             if view is UIImageView {
                 //Tap only on visible parts on the image
                 if recognizer.state == .began {
@@ -93,6 +93,7 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
         
         if let view = recognizer.view {
             self.activeView = view
+            self.pGesture.isEnabled = true
 
             if view is UIImageView {
                 //Tap only on visible parts on the image

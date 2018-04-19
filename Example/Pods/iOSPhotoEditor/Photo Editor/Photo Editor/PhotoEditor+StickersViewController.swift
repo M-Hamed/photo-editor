@@ -87,13 +87,16 @@ extension PhotoEditorViewController: StickersViewControllerDelegate {
         
         if !panAdded {
             
-            let panGesture = UIPanGestureRecognizer(target: self,
+            
+            pGesture = UIPanGestureRecognizer(target: self,
                                                     action: #selector(PhotoEditorViewController.panGesture))
-            panGesture.minimumNumberOfTouches = 1
-            panGesture.maximumNumberOfTouches = 1
-            panGesture.delegate = self
-            canvasView.addGestureRecognizer(panGesture)
+            pGesture.minimumNumberOfTouches = 1
+            pGesture.maximumNumberOfTouches = 1
+            pGesture.delegate = self
+            canvasView.addGestureRecognizer(pGesture)
             panAdded = true
+            
+            pGesture.isEnabled = true
         }
         
         let pinchGesture = UIPinchGestureRecognizer(target: self,

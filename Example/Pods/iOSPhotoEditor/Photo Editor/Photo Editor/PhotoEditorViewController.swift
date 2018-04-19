@@ -74,6 +74,7 @@ public final class PhotoEditorViewController: UIViewController {
     
     var stickersViewController: StickersViewController!
     
+    var pGesture:UIPanGestureRecognizer!
     var panAdded = false 
 
     //Register Custom font before we load XIB

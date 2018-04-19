@@ -42,6 +42,12 @@ extension PhotoEditorViewController {
     }
 
     @IBAction func drawButtonTapped(_ sender: Any) {
+      
+        self.activeView = nil
+        if let g = self.pGesture {
+            g.isEnabled = false
+        }
+        
         isDrawing = true
         canvasImageView.isUserInteractionEnabled = false
         doneButton.isHidden = false

@@ -12,6 +12,8 @@ extension PhotoEditorViewController {
     
     override public func touchesBegan(_ touches: Set<UITouch>,
                                       with event: UIEvent?){
+        
+        print("Begin....")
         if isDrawing {
             swiped = false
             if let touch = touches.first {
