@@ -18,6 +18,7 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
      Selecting transparent parts of the imageview won't move the object
      */
     func panGesture(_ recognizer: UIPanGestureRecognizer) {
+        
         if let view = recognizer.view {
             if view is UIImageView {
                 //Tap only on visible parts on the image
@@ -32,10 +33,10 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
                     }
                 }
                 if imageViewToPan != nil {
-                    moveView(view: imageViewToPan!, recognizer: recognizer)
+                    moveView(view: activeView, recognizer: recognizer)
                 }
             } else {
-                moveView(view: view, recognizer: recognizer)
+                moveView(view: activeView, recognizer: recognizer)
             }
         }
     }
@@ -45,7 +46,8 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
      If it's a UITextView will make the font bigger so it doen't look pixlated
      */
     func pinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-        if let view = recognizer.view {
+        
+        if let view = activeView {
             if view is UITextView {
                 let textView = view as! UITextView
                 
@@ -76,7 +78,7 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
      UIRotationGestureRecognizer - Rotating Objects
      */
     func rotationGesture(_ recognizer: UIRotationGestureRecognizer) {
-        if let view = recognizer.view {
+        if let view = activeView {
             view.transform = view.transform.rotated(by: recognizer.rotation)
             recognizer.rotation = 0
         }
@@ -88,7 +90,10 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
      Selecting transparent parts of the imageview won't move the object
      */
     func tapGesture(_ recognizer: UITapGestureRecognizer) {
+        
         if let view = recognizer.view {
+            self.activeView = view
+
             if view is UIImageView {
                 //Tap only on visible parts on the image
                 for imageView in subImageViews(view: canvasImageView) {

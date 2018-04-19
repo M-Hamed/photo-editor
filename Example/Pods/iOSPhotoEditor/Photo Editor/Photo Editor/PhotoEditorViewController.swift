@@ -10,6 +10,9 @@ import UIKit
 
 public final class PhotoEditorViewController: UIViewController {
     
+    /** active view */
+    var activeView: UIView!
+    
     /** holding the 2 imageViews original image and drawing & stickers */
     @IBOutlet weak var canvasView: UIView!
     //To hold the image
@@ -69,8 +72,9 @@ public final class PhotoEditorViewController: UIViewController {
     var imageViewToPan: UIImageView?
     var isTyping: Bool = false
     
-    
     var stickersViewController: StickersViewController!
+    
+    var panAdded = false 
 
     //Register Custom font before we load XIB
     public override func loadView() {

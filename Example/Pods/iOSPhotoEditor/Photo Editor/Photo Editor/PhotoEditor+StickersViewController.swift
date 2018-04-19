@@ -76,26 +76,35 @@ extension PhotoEditorViewController: StickersViewControllerDelegate {
         hideToolbar(hide: false)
     }
     
+    
+    
     func addGestures(view: UIView) {
+        
+        self.activeView = view
+        
         //Gestures
         view.isUserInteractionEnabled = true
         
-        let panGesture = UIPanGestureRecognizer(target: self,
-                                                action: #selector(PhotoEditorViewController.panGesture))
-        panGesture.minimumNumberOfTouches = 1
-        panGesture.maximumNumberOfTouches = 1
-        panGesture.delegate = self
-        view.addGestureRecognizer(panGesture)
+        if !panAdded {
+            
+            let panGesture = UIPanGestureRecognizer(target: self,
+                                                    action: #selector(PhotoEditorViewController.panGesture))
+            panGesture.minimumNumberOfTouches = 1
+            panGesture.maximumNumberOfTouches = 1
+            panGesture.delegate = self
+            canvasView.addGestureRecognizer(panGesture)
+            panAdded = true
+        }
         
         let pinchGesture = UIPinchGestureRecognizer(target: self,
                                                     action: #selector(PhotoEditorViewController.pinchGesture))
         pinchGesture.delegate = self
-        view.addGestureRecognizer(pinchGesture)
+        canvasView.addGestureRecognizer(pinchGesture)
         
         let rotationGestureRecognizer = UIRotationGestureRecognizer(target: self,
                                                                     action:#selector(PhotoEditorViewController.rotationGesture) )
         rotationGestureRecognizer.delegate = self
-        view.addGestureRecognizer(rotationGestureRecognizer)
+        canvasView.addGestureRecognizer(rotationGestureRecognizer)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(PhotoEditorViewController.tapGesture))
         view.addGestureRecognizer(tapGesture)
