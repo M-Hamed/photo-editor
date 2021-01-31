@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'iOSPhotoEditor'
-  s.version          = '1.0.0'
+  s.version          = '2.0.0'
   s.summary          = 'Photo Editor supports drawing, writing text and adding stickers and emojis'
 
   s.description      = <<-DESC
@@ -14,9 +14,8 @@ with the ability to scale and rotate objects
   s.source           = { :git => 'https://github.com/M-Hamed/photo-editor.git', :tag => s.version.to_s }
   s.swift_version    = '5.0'
 
-  s.ios.deployment_target = '9.0'
-  s.source_files = "iOSPhotoEditor/**/*.{swift}"
-  s.exclude_files = ""
-  s.resources = "iOSPhotoEditor/**/*.{png,jpeg,jpg,storyboard,xib,ttf}"
+  s.ios.deployment_target = '10.3'
+  s.source_files = 'iOSPhotoEditor/**/*.{swift}'
+  s.resource_bundle = { 'iOSPhotoEditor' => ['iOSPhotoEditor/**/*.{storyboard,xib,xcassets}'] }
 
 end

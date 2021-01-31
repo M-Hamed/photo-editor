@@ -122,7 +122,7 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
     
     @objc func screenEdgeSwiped(_ recognizer: UIScreenEdgePanGestureRecognizer) {
         if recognizer.state == .recognized {
-            if !stickersVCIsVisible {
+            if stickersViewController == nil {
                 addStickersViewController()
             }
         }
@@ -163,9 +163,9 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
 
     func moveView(view: UIView, recognizer: UIPanGestureRecognizer)  {
         
-        hideToolbar(hide: true)
-        deleteView.isHidden = false
-        
+        showToolbar(show: false)
+        showDeleteView(show: true)
+
         view.superview?.bringSubviewToFront(view)
         let pointToSuperView = recognizer.location(in: self.view)
 
@@ -200,8 +200,9 @@ extension PhotoEditorViewController : UIGestureRecognizerDelegate  {
         if recognizer.state == .ended {
             imageViewToPan = nil
             lastPanPoint = nil
-            hideToolbar(hide: false)
-            deleteView.isHidden = true
+            showDeleteView(show: false) {
+                self.showToolbar(show: true)
+            }
             let point = recognizer.location(in: self.view)
             
             if deleteView.frame.contains(point) { // Delete the view

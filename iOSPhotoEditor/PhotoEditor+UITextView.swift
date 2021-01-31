@@ -19,8 +19,12 @@ extension PhotoEditorViewController: UITextViewDelegate {
             textView.frame.size = CGSize(width: oldFrame.width, height: sizeToFit.height)
         }
     }
+    
     public func textViewDidBeginEditing(_ textView: UITextView) {
-        isTyping = true
+        showToolbar(show: false)
+        showDoneButton(show: true)
+        showColorPicker(show: true)
+
         lastTextViewTransform =  textView.transform
         lastTextViewTransCenter = textView.center
         lastTextViewFont = textView.font!
@@ -33,10 +37,12 @@ extension PhotoEditorViewController: UITextViewDelegate {
                         textView.center = CGPoint(x: UIScreen.main.bounds.width / 2,
                                                   y:  UIScreen.main.bounds.height / 5)
         }, completion: nil)
-        
     }
     
     public func textViewDidEndEditing(_ textView: UITextView) {
+        showToolbar(show: true)
+        showDoneButton(show: false)
+
         guard lastTextViewTransform != nil && lastTextViewTransCenter != nil && lastTextViewFont != nil
             else {
                 return

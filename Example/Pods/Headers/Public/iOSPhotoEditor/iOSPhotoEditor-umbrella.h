@@ -1,0 +1,1 @@
+../../../Target Support Files/iOSPhotoEditor/iOSPhotoEditor-umbrella.h

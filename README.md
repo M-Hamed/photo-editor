@@ -22,12 +22,10 @@ $ gem install cocoapods
 ```
 To integrate iOS Photo Editor into your Xcode project using CocoaPods, specify it in your `Podfile`:
 ```ruby
-source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '10.0'
-use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'iOSPhotoEditor'
+    pod 'iOSPhotoEditor', '~> 1.0'
 end
 ```
 
@@ -44,7 +42,10 @@ $ pod install
 The `PhotoEditorViewController`.
 
 ```swift
-let photoEditor = PhotoEditorViewController(nibName:"PhotoEditorViewController",bundle: Bundle(for: PhotoEditorViewController.self))
+guard let photoEditor = UIStoryboard(name: "PhotoEditor", bundle: Bundle.iOSPhotoEditorResourceBundle)
+        .instantiateViewController(withIdentifier: String(describing: PhotoEditorViewController.self)) as? PhotoEditorViewController
+        else { return }
+
 
 //PhotoEditorDelegate
 photoEditor.photoEditorDelegate = self
@@ -61,8 +62,12 @@ photoEditor.hiddenControls = [.crop, .draw, .share]
 //Optional: Colors for drawing and Text, If not set default values will be used
 photoEditor.colors = [.red,.blue,.green]
 
-//Present the View Controller
-present(photoEditor, animated: true, completion: nil)
+// Wrap in an UINavigationController
+let navigationController = UINavigationController(rootViewController: photoEditor)
+navigationController.modalPresentationStyle = UIModalPresentationStyle.currentContext //or .overFullScreen for transparency
+
+// Present
+present(navigationController, animated: true, completion: nil)
 ```
 The `PhotoEditorDelegate` methods.
 
@@ -89,6 +94,8 @@ func canceledEditing() {
 ## Credits
 
 Written by [Mohamed Hamed](https://github.com/M-Hamed).
+<br>With contributions by [Mickey Knox](https://github.com/knox).
+<br>Includes [PhotoCropEditor](https://github.com/sprint84/PhotoCropEditor) by [Guilherme Moura](https://github.com/sprint84).
 
 Initially sponsored by [![Eventtus](http://assets.eventtus.com/logos/eventtus/standard.png)](http://eventtus.com)
 

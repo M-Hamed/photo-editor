@@ -12,9 +12,11 @@ import UIKit
 extension PhotoEditorViewController {
     
     func addStickersViewController() {
-        stickersVCIsVisible = true
-        hideToolbar(hide: true)
+        guard stickersViewController == nil else { return }
+        showToolbar(show: false)
         self.canvasImageView.isUserInteractionEnabled = false
+
+        let stickersViewController = (storyboard?.instantiateViewController(withIdentifier: String(describing: StickersViewController.self)) as! StickersViewController)
         stickersViewController.stickersViewControllerDelegate = self
         
         for image in self.stickers {
@@ -26,23 +28,26 @@ extension PhotoEditorViewController {
         let height = view.frame.height
         let width  = view.frame.width
         stickersViewController.view.frame = CGRect(x: 0, y: self.view.frame.maxY , width: width, height: height)
+
+        self.stickersViewController = stickersViewController
     }
     
     func removeStickersView() {
-        stickersVCIsVisible = false
+        guard let stickersViewController = self.stickersViewController else { return }
         self.canvasImageView.isUserInteractionEnabled = true
         UIView.animate(withDuration: 0.3,
                        delay: 0,
                        options: UIView.AnimationOptions.curveEaseIn,
                        animations: { () -> Void in
-                        var frame = self.stickersViewController.view.frame
+                        var frame = stickersViewController.view.frame
                         frame.origin.y = UIScreen.main.bounds.maxY
-                        self.stickersViewController.view.frame = frame
+                        stickersViewController.view.frame = frame
                         
         }, completion: { (finished) -> Void in
-            self.stickersViewController.view.removeFromSuperview()
-            self.stickersViewController.removeFromParent()
-            self.hideToolbar(hide: false)
+            stickersViewController.willMove(toParent: nil)
+            stickersViewController.view.removeFromSuperview()
+            stickersViewController.removeFromParent()
+            self.showToolbar(show: true)
         })
     }    
 }
@@ -72,8 +77,8 @@ extension PhotoEditorViewController: StickersViewControllerDelegate {
     }
     
     func stickersViewDidDisappear() {
-        stickersVCIsVisible = false
-        hideToolbar(hide: false)
+        stickersViewController = nil
+        showToolbar(show: true)
     }
     
     func addGestures(view: UIView) {

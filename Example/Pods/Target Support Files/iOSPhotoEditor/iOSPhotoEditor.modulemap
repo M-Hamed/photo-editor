@@ -1,4 +1,4 @@
-framework module iOSPhotoEditor {
+module iOSPhotoEditor {
   umbrella header "iOSPhotoEditor-umbrella.h"
 
   export *

@@ -18,7 +18,7 @@ extension PhotoEditorViewController {
             }
         }
             //Hide stickersVC if clicked outside it
-        else if stickersVCIsVisible == true {
+        else if let stickersViewController = self.stickersViewController {
             if let touch = touches.first {
                 let location = touch.location(in: self.view)
                 if !stickersViewController.view.frame.contains(location) {

@@ -10,7 +10,7 @@ import UIKit
 
 class ColorsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    var colorDelegate : ColorDelegate?
+    weak var colorDelegate : ColorDelegate?
     
     /**
      Array of Colors that will show while drawing or typing
@@ -34,8 +34,6 @@ class ColorsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColl
         super.init()
     }
     
-    var stickersViewControllerDelegate : StickersViewControllerDelegate?
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return colors.count
     }
@@ -49,9 +47,19 @@ class ColorsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UIColl
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell  = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCollectionViewCell", for: indexPath) as! ColorCollectionViewCell
+        let cell  = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: ColorCollectionViewCell.self), for: indexPath) as! ColorCollectionViewCell
         cell.colorView.backgroundColor = colors[indexPath.item]
         return cell
     }
-    
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        let totalCellWidth = flowLayout.itemSize.width * CGFloat(collectionView.numberOfItems(inSection: 0))
+        let totalSpacingWidth = flowLayout.minimumInteritemSpacing * CGFloat((collectionView.numberOfItems(inSection: 0) - 1))
+
+        let leftInset = max(0.0, (collectionView.bounds.width - CGFloat(totalCellWidth + totalSpacingWidth)) / 2)
+        let rightInset = leftInset
+
+        return UIEdgeInsets(top: 0, left: leftInset, bottom: 0, right: rightInset)
+    }
 }

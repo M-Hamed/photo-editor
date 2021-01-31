@@ -5,7 +5,9 @@ This application makes use of the following third party libraries:
 
 MIT License
 
+Copyright (c) 2016 Guilherme Moura
 Copyright (c) 2017 Mohamed Hamed
+Copyright (c) 2020 Mickey Knox
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

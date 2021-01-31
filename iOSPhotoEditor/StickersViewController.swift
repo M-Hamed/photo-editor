@@ -14,13 +14,13 @@ class StickersViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var pageControl: UIPageControl!
     
-    var collectioView: UICollectionView!
-    var emojisCollectioView: UICollectionView!
+    var stickerCollectionView: UICollectionView!
+    var emojisCollectionView: UICollectionView!
     
     var emojisDelegate: EmojisCollectionViewDelegate!
     
     var stickers : [UIImage] = []
-    var stickersViewControllerDelegate : StickersViewControllerDelegate?
+    weak var stickersViewControllerDelegate : StickersViewControllerDelegate?
     
     let screenSize = UIScreen.main.bounds.size
     
@@ -34,13 +34,10 @@ class StickersViewController: UIViewController, UIGestureRecognizerDelegate {
         super.viewDidLoad()
         
         configureCollectionViews()
-        scrollView.contentSize = CGSize(width: 2.0 * screenSize.width,
-                                        height: scrollView.frame.size.height)
-        
         scrollView.isPagingEnabled = true
         scrollView.delegate = self
         pageControl.numberOfPages = 2
-        
+
         holdView.layer.cornerRadius = 3
         let gesture = UIPanGestureRecognizer.init(target: self, action: #selector(StickersViewController.panGesture))
         gesture.delegate = self
@@ -48,50 +45,82 @@ class StickersViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func configureCollectionViews() {
-        
-        let frame = CGRect(x: 0,
-                           y: 0,
-                           width: UIScreen.main.bounds.width,
-                           height: view.frame.height - 40)
-        
+
+        let contentView = UIView()
+        contentView.backgroundColor = .clear
+        scrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+
+        if #available(iOS 11.0, *) {
+            contentView.widthAnchor.constraint(equalTo:view.safeAreaLayoutGuide.widthAnchor, multiplier: 2).isActive = true
+        }
+        else {
+            contentView.widthAnchor.constraint(equalTo:view.widthAnchor, multiplier: 2).isActive = true
+        }
+        contentView.heightAnchor.constraint(equalTo:view.heightAnchor, constant: -headerView.frame.size.height).isActive = true
+
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
-        let width = (CGFloat) ((screenSize.width - 30) / 3.0)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        var interfaceOrientation: UIInterfaceOrientation
+        if #available(iOS 13.0, *) {
+            interfaceOrientation = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.windowScene?.interfaceOrientation
+                    ?? UIInterfaceOrientation.unknown
+        }
+        else {
+            interfaceOrientation = UIApplication.shared.statusBarOrientation
+        }
+        var width: CGFloat
+        if interfaceOrientation == .landscapeLeft || interfaceOrientation == .landscapeRight {
+            width =  (CGFloat) ((screenSize.height - layout.sectionInset.left - layout.sectionInset.right) / 3.0)
+        }
+        else {
+            width =  (CGFloat) ((screenSize.width - layout.sectionInset.left - layout.sectionInset.right) / 3.0)
+        }
         layout.itemSize = CGSize(width: width, height: 100)
+
+        stickerCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        stickerCollectionView.backgroundColor = .clear
+        contentView.addSubview(stickerCollectionView)
+        stickerCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        stickerCollectionView.leadingAnchor.constraint(equalTo:contentView.leadingAnchor).isActive = true
+        stickerCollectionView.topAnchor.constraint(equalTo:contentView.topAnchor).isActive = true
+        stickerCollectionView.bottomAnchor.constraint(equalTo:contentView.bottomAnchor).isActive = true
+        stickerCollectionView.widthAnchor.constraint(equalTo:contentView.widthAnchor, multiplier: 0.5).isActive = true
+
+        stickerCollectionView.delegate = self
+        stickerCollectionView.dataSource = self
         
-        collectioView = UICollectionView(frame: frame, collectionViewLayout: layout)
-        collectioView.backgroundColor = .clear
-        scrollView.addSubview(collectioView)
-        
-        collectioView.delegate = self
-        collectioView.dataSource = self
-        
-        collectioView.register(
-            UINib(nibName: "StickerCollectionViewCell", bundle: Bundle(for: StickerCollectionViewCell.self)),
-            forCellWithReuseIdentifier: "StickerCollectionViewCell")
+        stickerCollectionView.register(
+            UINib(nibName: String(describing: StickerCollectionViewCell.self), bundle: Bundle.iOSPhotoEditorResourceBundle),
+            forCellWithReuseIdentifier: String(describing: StickerCollectionViewCell.self))
         
         //-----------------------------------
         
-        let emojisFrame = CGRect(x: scrollView.frame.size.width,
-                                 y: 0,
-                                 width: UIScreen.main.bounds.width,
-                                 height: view.frame.height - 40)
-        
         let emojislayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        emojislayout.sectionInset = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
+        emojislayout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         emojislayout.itemSize = CGSize(width: 70, height: 70)
         
-        emojisCollectioView = UICollectionView(frame: emojisFrame, collectionViewLayout: emojislayout)
-        emojisCollectioView.backgroundColor = .clear
-        scrollView.addSubview(emojisCollectioView)
+        emojisCollectionView = UICollectionView(frame: .zero, collectionViewLayout: emojislayout)
+        emojisCollectionView.backgroundColor = .clear
+        contentView.addSubview(emojisCollectionView)
+        emojisCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        emojisCollectionView.leadingAnchor.constraint(equalTo:stickerCollectionView.trailingAnchor).isActive = true
+        emojisCollectionView.topAnchor.constraint(equalTo:contentView.topAnchor).isActive = true
+        emojisCollectionView.trailingAnchor.constraint(equalTo:contentView.trailingAnchor).isActive = true
+        emojisCollectionView.bottomAnchor.constraint(equalTo:contentView.bottomAnchor).isActive = true
+
         emojisDelegate = EmojisCollectionViewDelegate()
         emojisDelegate.stickersViewControllerDelegate = stickersViewControllerDelegate
-        emojisCollectioView.delegate = emojisDelegate
-        emojisCollectioView.dataSource = emojisDelegate
+        emojisCollectionView.delegate = emojisDelegate
+        emojisCollectionView.dataSource = emojisDelegate
         
-        emojisCollectioView.register(
-            UINib(nibName: "EmojiCollectionViewCell", bundle: Bundle(for: EmojiCollectionViewCell.self)),
-            forCellWithReuseIdentifier: "EmojiCollectionViewCell")
+        emojisCollectionView.register(
+            UINib(nibName: String(describing: EmojiCollectionViewCell.self), bundle: Bundle.iOSPhotoEditorResourceBundle),
+            forCellWithReuseIdentifier: String(describing: EmojiCollectionViewCell.self))
         
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -101,36 +130,31 @@ class StickersViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
+        let frame = self.view.frame
+        let yComponent = self.partialView
+        let height = UIScreen.main.bounds.height - self.partialView
         UIView.animate(withDuration: 0.6) { [weak self] in
-            guard let `self` = self else { return }
-            let frame = self.view.frame
-            let yComponent = self.partialView
+            guard let self = self else { return }
             self.view.frame = CGRect(x: 0,
                                      y: yComponent,
                                      width: frame.width,
-                                     height: UIScreen.main.bounds.height - self.partialView)
+                                     height: height)
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        collectioView.frame = CGRect(x: 0,
-                                     y: 0,
-                                     width: UIScreen.main.bounds.width,
-                                     height: view.frame.height - 40)
-        
-        emojisCollectioView.frame = CGRect(x: scrollView.frame.size.width,
-                                           y: 0,
-                                           width: UIScreen.main.bounds.width,
-                                           height: view.frame.height - 40)
-        
-        scrollView.contentSize = CGSize(width: 2.0 * screenSize.width,
-                                        height: scrollView.frame.size.height)
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(
+                alongsideTransition: { [weak self] _ in
+                    self?.stickerCollectionView.collectionViewLayout.invalidateLayout()
+                    self?.emojisCollectionView.collectionViewLayout.invalidateLayout()
+                },
+                completion: { [weak self] _ in
+                    self?.stickerCollectionView.collectionViewLayout.invalidateLayout()
+                    self?.emojisCollectionView.collectionViewLayout.invalidateLayout()
+                }
+        )
     }
     
     //MARK: Pan Gesture
@@ -175,15 +199,16 @@ class StickersViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func removeBottomSheetView() {
+        var frame = view.frame
+        frame.origin.y = UIScreen.main.bounds.maxY
         UIView.animate(withDuration: 0.3,
                        delay: 0,
                        options: UIView.AnimationOptions.curveEaseIn,
-                       animations: { () -> Void in
-                        var frame = self.view.frame
-                        frame.origin.y = UIScreen.main.bounds.maxY
-                        self.view.frame = frame
+                       animations: { [weak self] () -> Void in
+                        self?.view.frame = frame
                         
-        }, completion: { (finished) -> Void in
+        }, completion: { [weak self] (finished) -> Void in
+            guard let self = self else { return }
             self.view.removeFromSuperview()
             self.removeFromParent()
             self.stickersViewControllerDelegate?.stickersViewDidDisappear()
